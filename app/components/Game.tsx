@@ -17,6 +17,11 @@ interface GameProps {
     setTime: any;
     setCorrections: any;
     setGameEnded: any;
+    index: number;
+    setIndex: any;
+    keyPressed: boolean;
+    setKeyPressed: any;
+    gameEnded: boolean;
 }
 export default function Game({
     difficulty,
@@ -33,13 +38,13 @@ export default function Game({
     setTime,
     setCorrections,
     setGameEnded,
+    index,
+    setIndex,
+    keyPressed,
+    setKeyPressed,
+    gameEnded,
 }: GameProps) {
     const gameText: string = GAMETEXTS[difficulty as keyof typeof GAMETEXTS];
-
-    //STATES
-    const [index, setIndex] = useState<number>(0);
-
-    const [keyPressed, setKeyPressed] = useState<boolean>(false);
 
     useEffect(() => {
         // Update the time when difficulty or gameStarted changes
@@ -49,7 +54,7 @@ export default function Game({
         //HANDLE KEYPRESS
         const handleKeyPress = (e: KeyboardEvent) => {
             setKeyPressed(true);
-            if (e.key === 'Backspace' && index !== 0) {
+            if (e.key === 'Backspace' && index !== 0 && gameEnded === false) {
                 setCorrections((prev: number) => prev + 1);
                 setIndex(index - 1);
                 setWordsPressed((prev: any) => prev.slice(0, -1));
@@ -61,7 +66,7 @@ export default function Game({
                 return;
             }
             //CHECK IF KEY IS A LETTER OR NUMBER OR PONTUATION
-            if (checkValidEntry(e.key)) {
+            if (checkValidEntry(e.key) && gameEnded === false) {
                 if (e.key === gameText.charAt(index)) {
                     setIndex(index + 1);
                     setCorrectWords((prev: number[]) => [...prev, index]);
@@ -83,13 +88,13 @@ export default function Game({
 
     useEffect(() => {
         setTimeout(() => {
-            if (gameStarted && keyPressed) {
+            if (gameStarted && keyPressed && index < gameText.length) {
                 setTime(time + 1);
             }
         }, 1000);
 
         //GAME END STUFF
-        if (time === 0 || index === gameText.length) {
+        if (index === gameText.length && keyPressed) {
             const grossWpm = correctWords.length / 5 / (time / 60);
             const netWpm = Math.max(0, grossWpm - corrections);
             setWpm(Math.round(netWpm * 100) / 100);
@@ -99,7 +104,7 @@ export default function Game({
     return (
         <section
             className={`${
-                gameStarted ? 'flex' : 'hidden'
+                gameStarted && gameEnded === false ? 'flex' : 'hidden'
             } w-3/4  flex-col items-center justify-center flex-wrap gap-4`}
         >
             <h1

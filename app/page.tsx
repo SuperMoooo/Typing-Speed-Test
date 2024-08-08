@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import SelectDifficulty from './components/SelectDifficulty';
@@ -8,6 +7,7 @@ import { useState } from 'react';
 import EndGame from './components/EndGame';
 
 export default function Home() {
+    //STATES
     const [difficulty, setDifficulty] = useState<string>('easy');
     const [gameStarted, setGameStarted] = useState<boolean>(false);
     const [gameEnded, setGameEnded] = useState<boolean>(false);
@@ -17,10 +17,40 @@ export default function Home() {
     const [wpm, setWpm] = useState<number>(0);
     const [time, setTime] = useState<number>(0);
     const [corrections, setCorrections] = useState<number>(0);
+    const [index, setIndex] = useState<number>(0);
+    const [keyPressed, setKeyPressed] = useState<boolean>(false);
 
-    const handleStartGame = (e: any, selectedDifficulty: string) => {
+    const handleStartGame = (e: any) => {
         e.preventDefault();
         setGameStarted(true);
+    };
+
+    const handleRestartGame = (e: MouseEvent) => {
+        e.preventDefault();
+        setGameStarted(true);
+        setGameEnded(false);
+        setCorrectWords([]);
+        setWrongWords([]);
+        setWordsPressed([]);
+        setWpm(0);
+        setTime(0);
+        setCorrections(0);
+        setIndex(0);
+        setKeyPressed(false);
+    };
+
+    const handleChooseDificulty = (e: MouseEvent) => {
+        e.preventDefault();
+        setGameStarted(false);
+        setGameEnded(false);
+        setCorrectWords([]);
+        setWrongWords([]);
+        setWordsPressed([]);
+        setWpm(0);
+        setTime(0);
+        setCorrections(0);
+        setIndex(0);
+        setKeyPressed(false);
     };
     return (
         <div className="min-h-[100dvh] grid grid-rows-[auto_1fr_auto]">
@@ -47,6 +77,11 @@ export default function Home() {
                     setTime={setTime}
                     setCorrections={setCorrections}
                     setGameEnded={setGameEnded}
+                    index={index}
+                    setIndex={setIndex}
+                    keyPressed={keyPressed}
+                    setKeyPressed={setKeyPressed}
+                    gameEnded={gameEnded}
                 />
                 <EndGame
                     difficulty={difficulty}
@@ -55,7 +90,10 @@ export default function Home() {
                     wordsPressed={wordsPressed}
                     time={time}
                     corrections={corrections}
+                    wpm={wpm}
                     gameEnded={gameEnded}
+                    restartGame={handleRestartGame}
+                    chooseDificulty={handleChooseDificulty}
                 />
             </main>
             <Footer />
